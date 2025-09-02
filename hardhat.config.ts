@@ -5,6 +5,13 @@ import { configVariable } from "hardhat/config";
 
 const config: HardhatUserConfig = {
   plugins: [hardhatToolboxViemPlugin],
+  ignition: {
+    strategyConfig: {
+      create2: {
+        salt: "0x0000000000000000000000000000000000000000000000000000000000000001",
+      },
+    },
+  },
   solidity: {
     profiles: {
       default: {
@@ -22,6 +29,14 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    optimism: {
+      type: "http",
+      chainType: "op",
+      url: "https://optimism-rpc.publicnode.com",
+      accounts: {
+        mnemonic: configVariable("TEST_MNEMONIC"),
+      },
+    },
     hardhatMainnet: {
       type: "edr-simulated",
       chainType: "l1",

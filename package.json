@@ -6,10 +6,15 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition": "^3.0.2",
     "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
+    "@openzeppelin/contracts": "^5.4.0",
     "@types/node": "^22.18.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
     "hardhat": "^3.0.4",
     "typescript": "~5.8.3",
     "viem": "^2.37.1"
+  },
+  "scripts": {
+    "deployTestToken": "hardhat ignition deploy ignition/modules/TestCoin.ts --strategy create2 --build-profile production",
+    "sendTestCoin": "hardhat run scripts/sendTestCoin.ts"
   }
 }

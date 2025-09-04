@@ -2,6 +2,7 @@ import type { HardhatUserConfig } from "hardhat/config";
 
 import hardhatToolboxViemPlugin from "@nomicfoundation/hardhat-toolbox-viem";
 import { configVariable } from "hardhat/config";
+import { parseEther } from "viem";
 
 const config: HardhatUserConfig = {
   plugins: [hardhatToolboxViemPlugin],
@@ -32,6 +33,7 @@ const config: HardhatUserConfig = {
     optimism: {
       type: "http",
       chainType: "op",
+      chainId: 10,
       url: "https://optimism-rpc.publicnode.com",
       accounts: {
         mnemonic: configVariable("TEST_MNEMONIC"),

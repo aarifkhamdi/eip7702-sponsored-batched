@@ -1,57 +1,132 @@
-# Sample Hardhat 3 Beta Project (`node:test` and `viem`)
+# EIP-7702 Sponsored Batched Transactions Demo
 
-This project showcases a Hardhat 3 Beta project using the native Node.js test runner (`node:test`) and the `viem` library for Ethereum interactions.
+This project demonstrates how to use EIP-7702 to sponsor gas fees and collect funds from deposit wallets using sponsored transactions with batching support. The demo showcases a practical implementation of EIP-7702's account abstraction capabilities for efficient multi-wallet operations.
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+## What is EIP-7702?
+
+EIP-7702 introduces account abstraction by allowing externally owned accounts (EOAs) to temporarily delegate their execution to smart contract code during a transaction. This enables features like:
+
+- **Gas sponsorship**: A different account can pay for transaction gas
+- **Batched operations**: Execute multiple operations in a single transaction
+- **Enhanced security**: Add custom logic to EOA transactions
 
 ## Project Overview
 
-This example project includes:
+This demo includes:
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using [`node:test`](nodejs.org/api/test.html), the new Node.js native test runner, and [`viem`](https://viem.sh/).
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+- **Smart Contracts**:
+  - `Wallet.sol`: A simple wallet contract that can be delegated to EOAs via EIP-7702
+  - `Batcher.sol`: A contract for executing multiple calls in a single transaction
+  - `TestCoin.sol`: An ERC-20 token for testing transfers
+- **TypeScript Scripts**:
 
-## Usage
+  - Deployment scripts for all contracts
+  - Fund distribution script for test wallets
+  - Main demo script showcasing sponsored batched transactions
 
-### Running Tests
+- **Key Features**:
+  - Gas sponsorship using EIP-7702 authorization lists
+  - Batched token transfers from multiple wallets
+  - Hardhat 3 Beta integration with `viem` for EIP-7702 support
 
-To run all the tests in the project, execute the following command:
+## How It Works
+
+1. **Authorization**: Child wallets sign EIP-7702 authorization messages to delegate execution to the `Wallet` contract
+2. **Batching**: The `Batcher` contract receives multiple calls and executes them sequentially
+3. **Sponsorship**: A sponsor account pays gas for the entire batch transaction
+4. **Execution**: Token transfers are executed from multiple child wallets in a single sponsored transaction
+
+## Live Demo on Optimism
+
+### Deployed Contracts
+
+The following contracts have been deployed on Optimism mainnet:
+
+- **TestCoin (ERC-20)**: [`0xA8C14b02CCa34f3595161CeA593B291009038426`](https://optimistic.etherscan.io/address/0xA8C14b02CCa34f3595161CeA593B291009038426)
+- **Wallet Contract**: [`0x3BF35243aE319B3be9649f707eaB23E1502F2E27`](https://optimistic.etherscan.io/address/0x3BF35243aE319B3be9649f707eaB23E1502F2E27)
+- **Batcher Contract**: [`0x837F465302D425E9cF22b986c8DCeB2542f68159`](https://optimistic.etherscan.io/address/0x837F465302D425E9cF22b986c8DCeB2542f68159)
+
+### Example Transaction
+
+You can see a live example of the sponsored batched transaction on Optimism:
+
+**Transaction Hash**: [`0x785397663999b859ba443ce7c235cf06a13655d7fe290bce9c1f2215d56b7c92`](https://optimistic.etherscan.io/tx/0x785397663999b859ba443ce7c235cf06a13655d7fe290bce9c1f2215d56b7c92)
+
+This transaction demonstrates:
+
+- EIP-7702 authorization delegation from multiple EOAs to the Wallet contract
+- Sponsored gas payment by a single account
+- Batched execution of token transfers from 5 different wallets
+- All operations completed in a single transaction
+
+## Setup and Usage
+
+### Prerequisites
+
+- Node.js (v18 or later)
+- pnpm package manager
+- An Ethereum network that supports EIP-7702 (e.g., local testnet, specific testnets)
+
+### Installation
 
 ```shell
-npx hardhat test
+pnpm install
 ```
 
-You can also selectively run the Solidity or `node:test` tests:
+### Configuration
 
-```shell
-npx hardhat test solidity
-npx hardhat test nodejs
-```
+1. **Set the TEST_MNEMONIC variable:**
+   ```shell
+   pnpm hardhat keystore set TEST_MNEMONIC
+   ```
+   This will prompt you to enter your twelve word mnemonic phrase securely. This mnemonic will be used to generate the sponsor account and child wallets.
 
-### Make a deployment to Sepolia
+### Deployment Steps
 
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+2. **Deploy the TestCoin contract:**
 
-To run the deployment to a local chain:
+   ```shell
+   pnpm run deployTestToken --network optimism
+   ```
 
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
+3. **Deploy the Wallet contract:**
 
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+   ```shell
+   pnpm run deployWallet --network optimism
+   ```
 
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+4. **Deploy the Batcher contract:**
+   ```shell
+   pnpm run deployBatcher --network optimism
+   ```
 
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+### Running the Demo
 
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
+5. **Fund the child wallets with test tokens:**
 
-After setting the variable, you can run the deployment with the Sepolia network:
+   ```shell
+   pnpm run sendTestCoin --network optimism
+   ```
 
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+   This script will send 100 TestCoin tokens to each of the 5 child wallets.
+
+6. **Run the main demo:**
+   ```shell
+   pnpm run demo --network optimism
+   ```
+   This will execute a sponsored batch transaction that transfers 5 tokens from each child wallet to a receiver, with all gas costs paid by the sponsor account.
+
+## Benefits Demonstrated
+
+- **Cost Efficiency**: Single transaction for multiple operations reduces gas costs
+- **User Experience**: Child wallets don't need ETH for gas
+- **Scalability**: Batch operations scale better than individual transactions
+- **Flexibility**: Sponsor can be any account, enabling various business models
+
+## Available Scripts
+
+- `pnpm run deployTestToken --network optimism` - Deploy the TestCoin ERC-20 token contract
+- `pnpm run deployWallet --network optimism` - Deploy the Wallet contract for EIP-7702 delegation
+- `pnpm run deployBatcher --network optimism` - Deploy the Batcher contract for batched operations
+- `pnpm run sendTestCoin --network optimism` - Distribute TestCoin tokens to child wallets
+- `pnpm run demo --network optimism` - Execute the main sponsored batched transaction demo

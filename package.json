@@ -10,11 +10,14 @@
     "@types/node": "^22.18.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
     "hardhat": "^3.0.4",
-    "typescript": "~5.8.3",
+    "typescript": "~5.9.2",
     "viem": "^2.37.1"
   },
   "scripts": {
     "deployTestToken": "hardhat ignition deploy ignition/modules/TestCoin.ts --strategy create2 --build-profile production",
-    "sendTestCoin": "hardhat run scripts/sendTestCoin.ts"
+    "deployWallet": "hardhat ignition deploy ignition/modules/Wallet.ts --strategy create2 --build-profile production",
+    "deployBatcher": "hardhat ignition deploy ignition/modules/Batcher.ts --strategy create2 --build-profile production",
+    "sendTestCoin": "hardhat run scripts/sendTestCoin.ts",
+    "demo": "hardhat run scripts/demo.ts"
   }
 }
